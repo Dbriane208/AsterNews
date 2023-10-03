@@ -6,10 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import daniel.brian.asternews.presentation.home.AsterHomeScreen
+import daniel.brian.asternews.presentation.home.HomeViewModel
 import daniel.brian.asternews.ui.theme.AsterNewsTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,30 +18,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AsterNewsTheme {
+                val viewModel: HomeViewModel = hiltViewModel()
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    Greeting("Android")
+                    AsterHomeScreen(
+                        uiState = viewModel.state.collectAsState().value,
+                        onCardClick = { /*TODO*/ },
+                        onShareButtonClick = { title, body ->
+                            viewModel.shareNews(title, body, this)
+                        },
+                        onMenuClicked = { /*TODO*/ },
+                        onSearchClicked = { /*TODO*/ },
+                        onCategoryClick = {
+                            viewModel.setCategorySelected(it)
+                        },
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AsterNewsTheme {
-        Greeting("Android")
     }
 }

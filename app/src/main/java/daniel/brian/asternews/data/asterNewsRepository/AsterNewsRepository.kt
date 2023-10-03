@@ -1,4 +1,4 @@
-package com.samkt.asternews.data.asterNewsRepository
+package daniel.brian.asternews.data.asterNewsRepository
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig

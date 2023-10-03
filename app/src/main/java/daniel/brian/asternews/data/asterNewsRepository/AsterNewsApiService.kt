@@ -1,4 +1,4 @@
-package com.samkt.asternews.data.asterNewsRepository
+package daniel.brian.asternews.data.asterNewsRepository
 
 import com.samkt.asternews.BuildConfig
 import daniel.brian.asternews.data.asterNewsDtos.AllArticles
