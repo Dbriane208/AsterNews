@@ -107,7 +107,7 @@ class HomeViewModel @Inject constructor(
             .putExtra(Intent.EXTRA_TEXT, body)
         intent.type = ("text/plain")
 
-        val chooserTitle = "Share Via"
+        val chooserTitle = "Share Via!"
         val chooserIntent = Intent.createChooser(intent, chooserTitle)
         activity.startActivity(chooserIntent)
     }
