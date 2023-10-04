@@ -18,7 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import daniel.brian.asternews.presentation.home.components.ArticlesCard
 import daniel.brian.asternews.presentation.home.components.CategoryList
+import daniel.brian.asternews.presentation.home.components.ErrorScreen
 import daniel.brian.asternews.presentation.home.components.HomeAppBar
+import daniel.brian.asternews.presentation.home.components.LoadingIndicator
 import daniel.brian.asternews.ui.theme.AsterNewsTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,7 @@ fun AsterHomeScreen(
     onMenuClicked: () -> Unit,
     onSearchClicked: () -> Unit,
     onCategoryClick: (String) -> Unit,
+    retryOnError: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -60,18 +63,27 @@ fun AsterHomeScreen(
     ) { paddingValues ->
         val results = viewModel.state.collectAsState().value
 
-        Column(
-            modifier = Modifier.padding(paddingValues),
-        ) {
-            LazyColumn(content = {
-                items(results.articles) {
-                    ArticlesCard(
-                        results = it,
-                        onCardClick = onCardClick,
-                        onClickShareButton = onShareButtonClick,
-                    )
-                }
-            })
+        if (uiState.isLoading) {
+            LoadingIndicator()
+        } else if (uiState.errorMessage != null) {
+            ErrorScreen(
+                message = uiState.errorMessage,
+                retryOnError = retryOnError,
+            )
+        } else {
+            Column(
+                modifier = Modifier.padding(paddingValues),
+            ) {
+                LazyColumn(content = {
+                    items(results.articles) {
+                        ArticlesCard(
+                            results = it,
+                            onCardClick = onCardClick,
+                            onClickShareButton = onShareButtonClick,
+                        )
+                    }
+                })
+            }
         }
     }
 }

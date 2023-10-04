@@ -1,6 +1,5 @@
 package daniel.brian.asternews.data.asterNewsRepository
 
-
 import daniel.brian.asternews.BuildConfig
 import daniel.brian.asternews.data.asterNewsDtos.AllArticles
 import retrofit2.http.POST
@@ -17,6 +16,6 @@ interface AsterNewsApiService {
     suspend fun getArticlesOnCategory(
         @Query("apiKey") apiKey: String = BuildConfig.API_KEY,
         @Query("lang") lang: String = "eng",
-        @Query("keyword") keyword: String? = null,
+        @Query("keyword") categoryName: String,
     ): AllArticles
 }
