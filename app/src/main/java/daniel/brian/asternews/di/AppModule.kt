@@ -18,11 +18,15 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
     @Provides
     @Singleton
     fun provideAsterNewsApiService(): AsterNewsApiService = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
         .build()
         .create(AsterNewsApiService::class.java)
 
