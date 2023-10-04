@@ -1,6 +1,7 @@
 package daniel.brian.asternews.data.asterNewsRepository
 
-import com.samkt.asternews.BuildConfig
+
+import daniel.brian.asternews.BuildConfig
 import daniel.brian.asternews.data.asterNewsDtos.AllArticles
 import retrofit2.http.POST
 import retrofit2.http.Query

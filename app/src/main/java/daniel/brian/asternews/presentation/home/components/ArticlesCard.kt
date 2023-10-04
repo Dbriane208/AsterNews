@@ -1,4 +1,4 @@
-package com.samkt.asternews.presentation.home.components
+package daniel.brian.asternews.presentation.home.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

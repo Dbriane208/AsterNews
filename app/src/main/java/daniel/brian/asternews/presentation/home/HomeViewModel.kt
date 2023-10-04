@@ -4,18 +4,17 @@ import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import daniel.brian.asternews.presentation.home.components.ArticlesCategories
 import dagger.hilt.android.lifecycle.HiltViewModel
-import daniel.brian.asternews.data.asterNewsDtos.AllArticles
+import daniel.brian.asternews.data.asterNewsDtos.Result
 import daniel.brian.asternews.data.asterNewsRepository.AsterNewsRepository
+import daniel.brian.asternews.presentation.home.components.ArticlesCategories
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,32 +25,59 @@ class HomeViewModel @Inject constructor(
     private var _state = MutableStateFlow(HomeUiState())
     val state = _state.asStateFlow()
 
-    private var _articles: MutableStateFlow<PagingData<AllArticles>> =
-        MutableStateFlow(value = PagingData.empty())
-
-    val articles = _articles.asStateFlow()
-
     init {
         getAllArticles()
     }
 
     private fun getAllArticles() {
         viewModelScope.launch {
-            val allArticles = asterNewsRepository.getAllArticles()
-            allArticles.collectLatest { allArticles ->
+            try {
+                val allArticles = asterNewsRepository.getAllArticles()
+                allArticles
+                    .distinctUntilChanged()
+                    .collectLatest { allArticles ->
+                        _state.update {
+                            it.copy(
+                                articles = allArticles.articles.results,
+                                hasErrorOccured = false,
+                            )
+                        }
+                    }
+            } catch (e: HttpException) {
+                updateErrorOccured(true)
+            } catch (e: HttpException) {
+                updateErrorOccured(true)
             }
         }
     }
 
     private fun getArticlesByCategory(keyword: String) {
         viewModelScope.launch {
-            val allArticles = asterNewsRepository.getArticlesOnCategory(keyword)
-            allArticles
-                .distinctUntilChanged()
-                .cachedIn(viewModelScope)
-                .collectLatest { allArticles ->
-                    _articles.value = allArticles
-                }
+            try {
+                val allArticles = asterNewsRepository.getArticlesOnCategory(keyword)
+                allArticles
+                    .distinctUntilChanged()
+                    .collectLatest { allArticles ->
+                        _state.update {
+                            it.copy(
+                                articles = allArticles.articles.results,
+                                hasErrorOccured = false,
+                            )
+                        }
+                    }
+            } catch (e: HttpException) {
+                updateErrorOccured(true)
+            } catch (e: HttpException) {
+                updateErrorOccured(true)
+            }
+        }
+    }
+
+    fun updateErrorOccured(boolean: Boolean) {
+        _state.update {
+            it.copy(
+                hasErrorOccured = boolean,
+            )
         }
     }
 
@@ -70,7 +96,7 @@ class HomeViewModel @Inject constructor(
         if (categoryName != ArticlesCategories.ALL.value) {
             getArticlesByCategory(categoryName)
         } else {
-            getArticlesByCategory(categoryName)
+            getAllArticles()
         }
         _state.update {
             it.copy(
@@ -81,6 +107,8 @@ class HomeViewModel @Inject constructor(
 }
 
 data class HomeUiState(
+    val articles: List<Result> = emptyList(),
     val categories: List<ArticlesCategories> = emptyList(),
     val categoryNameSelected: String = ArticlesCategories.ALL.value,
+    val hasErrorOccured: Boolean = false,
 )
